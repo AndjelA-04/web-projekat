@@ -75,6 +75,28 @@ const User = mongoose.model('User', userSchema, 'users');
 const Movie = mongoose.model('Movie', movieSchema, 'movies');
 app.use(express.json()); 
 
+app.get('/m', (req,res) =>{
+  const movies = req.body
+  for(i=0;i<movies.length;i++){
+      const newMovie = new Movie(movies[i]);
+      newMovie.save()
+      console.log(movies)
+    }
+    res.sendStatus(200)
+});
+
+
+app.get('/u', (req,res) =>{
+  const user = req.body
+  for(i=0;i<user.length;i++){
+      const newUser = new User(user[i]);
+      newUser.save()
+      console.log(user)
+    }
+    res.sendStatus(200)
+})
+
+
 app.post('/login', async (req, res) => {
   const {username, password} = req.body;
   const user = await User.findOne({'username': username, 'password' : password})
@@ -138,7 +160,7 @@ app.put('/movies/:id', (req, res) => {
 });
 
 
-app.delete('/movies/:id', (req, res) => {
+app.delete('/movies/:id', authMiddleware, (req, res) => {
     const id = req.params.id;
     Movie.deleteOne({ '_id': id })
     .then(() => res.json({ message: 'Movie deleted successfully' }))
